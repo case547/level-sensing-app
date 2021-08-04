@@ -13,7 +13,6 @@ import numpy as np
 import exptool as et
 
 data_interval = 0
-PEAK_MERGE_LIMIT_M = 0.005
 
 def start(get_interval, params):
     global data_interval
