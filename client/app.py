@@ -18,14 +18,15 @@ PEAK_MERGE_LIMIT_M = 0.005
 def start(get_interval, params):
     global data_interval
     global client
+    global processor
     publish_data({"message": "Started with get_interval={:f}, parameters={:s}".format(get_interval, str(params))})
     data_interval = get_interval
 
     client = et.SocketClient(params['ip_a']) # Raspberry Pi uses socket client
     
-    config = et.configs.EnvelopeServiceConfig() # picking envelope service
+    config = et.configs.EnvelopeServiceConfig() # use envelope service
 
-    sensor_config = get_sensor_config(config)
+    sensor_config = get_sensor_config(config, params)
     sensor_config.sensor = [1]
 
     processing_config = get_processing_config()
@@ -38,7 +39,6 @@ def start(get_interval, params):
 
     # Set up session with created config
     session_info = client.setup_session(sensor_config) # also calls connect()
-    print("Session info:\n", session_info, "\n")
 
     client.start_session() # call will block until sensor confirms its start
 
@@ -53,11 +53,30 @@ def get(counter):
 
         if plot_data["found_peaks"]:
             peaks = np.take(processor.r, plot_data["found_peaks"]) * 100.0
-            print(info, "\n", "{:.2f} cm".format(peaks[0]), "\n")
+            publish_data({"distance": peaks[0]})
 
 def stop():
     publish_data({"message": "Stopped"})
     client.disconnect()
+
+
+def get_sensor_config(config, params):
+    """Define default sensor config."""
+    for k, v in params.items():
+        if hasattr(config, k):
+            try:
+                setattr(config, k, eval(v))
+            except:
+                setattr(config, k, v)
+
+    # downsampling_factor - must be 1, 2, or 4
+    # hw_accelerated_average_samples - number of samples taken for single point in data, [1,63]
+    # range_interval - measurement range (metres)
+    # running_average_factor - keep as 0; use averaging in detector instead of in API
+    # tx_disable - enable/disable radio transmitter
+    # update_rate - target measurement rate (Hz)
+
+    return config
 
 
 if __name__ == "__main__":    
