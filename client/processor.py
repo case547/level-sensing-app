@@ -43,36 +43,36 @@ class Processor:
 
         self.fixed_threshold_level = processing_config.fixed_threshold
 
-        # self.idx_cfar_pts = np.round(
-        #     (
-        #         processing_config.cfar_guard_cm / 100.0 / 2.0 / self.dr
-        #         + np.arange(processing_config.cfar_window_cm / 100.0 / self.dr)
-        #     )
-        # )
+        self.idx_cfar_pts = np.round(
+            (
+                processing_config.cfar_guard_cm / 100.0 / 2.0 / self.dr
+                + np.arange(processing_config.cfar_window_cm / 100.0 / self.dr)
+            )
+        )
 
-        # self.cfar_one_sided = processing_config.cfar_one_sided
-        # self.cfar_sensitivity = processing_config.cfar_sensitivity
+        self.cfar_one_sided = processing_config.cfar_one_sided
+        self.cfar_sensitivity = processing_config.cfar_sensitivity
 
         self.history_length_s = processing_config.history_length_s
 
-    # def calculate_cfar_threshold(self, sweep, idx_cfar_pts, alpha, one_side):
+    def calculate_cfar_threshold(self, sweep, idx_cfar_pts, alpha, one_side):
 
-    #     threshold = np.full(sweep.shape, np.nan)
+        threshold = np.full(sweep.shape, np.nan)
 
-    #     start_idx = np.max(idx_cfar_pts)
-    #     if one_side:
-    #         rel_indexes = -idx_cfar_pts
-    #         end_idx = sweep.size
-    #     else:
-    #         rel_indexes = np.concatenate((-idx_cfar_pts, +idx_cfar_pts), axis=0)
-    #         end_idx = sweep.size - start_idx
+        start_idx = np.max(idx_cfar_pts)
+        if one_side:
+            rel_indexes = -idx_cfar_pts
+            end_idx = sweep.size
+        else:
+            rel_indexes = np.concatenate((-idx_cfar_pts, +idx_cfar_pts), axis=0)
+            end_idx = sweep.size - start_idx
 
-    #     for idx in np.arange(start_idx, end_idx):
-    #         threshold[int(idx)] = (
-    #             1.0 / (alpha + 1e-10) * np.mean(sweep[(idx + rel_indexes).astype(int)])
-    #         )
+        for idx in np.arange(start_idx, end_idx):
+            threshold[int(idx)] = (
+                1.0 / (alpha + 1e-10) * np.mean(sweep[(idx + rel_indexes).astype(int)])
+            )
 
-    #     return threshold
+        return threshold
 
     def find_first_point_above_threshold(self, sweep, threshold):
 
@@ -372,63 +372,63 @@ class ProcessingConfiguration(et.configbase.ProcessingConfig):
         ),
     )
 
-    # cfar_sensitivity = et.configbase.FloatParameter(
-    #     label="CFAR sensitivity",
-    #     default_value=0.5,
-    #     limits=(0.01, 1),
-    #     logscale=True,
-    #     visible=lambda conf: conf.threshold_type == conf.ThresholdType.CFAR,
-    #     decimals=4,
-    #     updateable=True,
-    #     order=40,
-    #     help=(
-    #         "Value between 0 and 1 that sets the threshold. A low sensitivity will set a "
-    #         "high threshold, resulting in only few false alarms but might result in "
-    #         "missed detections."
-    #     ),
-    # )
+    cfar_sensitivity = et.configbase.FloatParameter(
+        label="CFAR sensitivity",
+        default_value=0.5,
+        limits=(0.01, 1),
+        logscale=True,
+        visible=lambda conf: conf.threshold_type == conf.ThresholdType.CFAR,
+        decimals=4,
+        updateable=True,
+        order=40,
+        help=(
+            "Value between 0 and 1 that sets the threshold. A low sensitivity will set a "
+            "high threshold, resulting in only few false alarms but might result in "
+            "missed detections."
+        ),
+    )
 
-    # cfar_guard_cm = et.configbase.FloatParameter(
-    #     label="CFAR guard",
-    #     default_value=12,
-    #     limits=(1, 20),
-    #     unit="cm",
-    #     decimals=1,
-    #     visible=lambda conf: conf.threshold_type == conf.ThresholdType.CFAR,
-    #     updateable=True,
-    #     order=41,
-    #     help=(
-    #         "Range around the distance of interest that is omitted when calculating "
-    #         "CFAR threshold. Can be low, ~4 cm, for Profile 1, and should be "
-    #         "increased for higher Profiles."
-    #     ),
-    # )
+    cfar_guard_cm = et.configbase.FloatParameter(
+        label="CFAR guard",
+        default_value=12,
+        limits=(1, 20),
+        unit="cm",
+        decimals=1,
+        visible=lambda conf: conf.threshold_type == conf.ThresholdType.CFAR,
+        updateable=True,
+        order=41,
+        help=(
+            "Range around the distance of interest that is omitted when calculating "
+            "CFAR threshold. Can be low, ~4 cm, for Profile 1, and should be "
+            "increased for higher Profiles."
+        ),
+    )
 
-    # cfar_window_cm = et.configbase.FloatParameter(
-    #     label="CFAR window",
-    #     default_value=3,
-    #     limits=(0.1, 20),
-    #     unit="cm",
-    #     decimals=1,
-    #     visible=lambda conf: conf.threshold_type == conf.ThresholdType.CFAR,
-    #     updateable=True,
-    #     order=42,
-    #     help="Range next to the CFAR guard from which the threshold level will be calculated.",
-    # )
+    cfar_window_cm = et.configbase.FloatParameter(
+        label="CFAR window",
+        default_value=3,
+        limits=(0.1, 20),
+        unit="cm",
+        decimals=1,
+        visible=lambda conf: conf.threshold_type == conf.ThresholdType.CFAR,
+        updateable=True,
+        order=42,
+        help="Range next to the CFAR guard from which the threshold level will be calculated.",
+    )
 
-    # cfar_one_sided = et.configbase.BoolParameter(
-    #     label="Use only lower distance to set threshold",
-    #     default_value=False,
-    #     visible=lambda conf: conf.threshold_type == conf.ThresholdType.CFAR,
-    #     updateable=True,
-    #     order=43,
-    #     help=(
-    #         "Instead of determining the CFAR threshold from sweep amplitudes from "
-    #         "distances both closer and a farther, use only closer. Helpful e.g. for "
-    #         "fluid level in small tanks, where many multipath signal can apprear "
-    #         "just after the main peak."
-    #     ),
-    # )
+    cfar_one_sided = et.configbase.BoolParameter(
+        label="Use only lower distance to set threshold",
+        default_value=False,
+        visible=lambda conf: conf.threshold_type == conf.ThresholdType.CFAR,
+        updateable=True,
+        order=43,
+        help=(
+            "Instead of determining the CFAR threshold from sweep amplitudes from "
+            "distances both closer and a farther, use only closer. Helpful e.g. for "
+            "fluid level in small tanks, where many multipath signal can apprear "
+            "just after the main peak."
+        ),
+    )
 
     peak_sorting_type = et.configbase.EnumParameter(
         label="Peak sorting",
@@ -463,18 +463,6 @@ class ProcessingConfiguration(et.configbase.ProcessingConfig):
             "alternative to peak detection."
         ),
     )
-
-    # Configure parameters here
-    nbr_average = 5.0
-    threshold_type = ThresholdType.FIXED
-    fixed_threshold = 1800
-
-    # processor_params = json.loads(processor_json)
-    # for k, v in processor_params.items():
-    #     try:
-    #         eval(k) = eval(v)
-    #     except:
-    #         eval(k) = v
 
     def check_sensor_config(self, sensor_config):
         alerts = {
