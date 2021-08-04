@@ -17,10 +17,11 @@ PEAK_MERGE_LIMIT_M = 0.005
 
 def start(get_interval, params):
     global data_interval
+    global client
     publish_data({"message": "Started with get_interval={:f}, parameters={:s}".format(get_interval, str(params))})
     data_interval = get_interval
 
-    client = et.SocketClient(json_as_py['ip_a']) # Raspberry Pi uses socket client
+    client = et.SocketClient(params['ip_a']) # Raspberry Pi uses socket client
     
     config = et.configs.EnvelopeServiceConfig() # picking envelope service
 
@@ -28,7 +29,7 @@ def start(get_interval, params):
     sensor_config.sensor = [1]
 
     processing_config = get_processing_config()
-    for k, v in json_as_py.items():
+    for k, v in params.items():
         if hasattr(processing_config, k):
             try:
                 setattr(processing_config, k, eval(v))
@@ -45,16 +46,18 @@ def start(get_interval, params):
 
 def get(counter):
     global data_interval
-    # Grab a measurement here
-    t = counter*data_interval
-    temperature = 20+sin(t*6.28/300)
-    humidity = 50+10*cos(t*6.28/300)
-    publish_data({
-        "temperature": temperature,
-        "humidity": humidity})
+    # Grab a measurement here - averaged over 5 sweeps for noise reduction
+    for _ in range(5):
+        info, sweep = client.get_next()
+        plot_data = processor.process(sweep, info)
+
+        if plot_data["found_peaks"]:
+            peaks = np.take(processor.r, plot_data["found_peaks"]) * 100.0
+            print(info, "\n", "{:.2f} cm".format(peaks[0]), "\n")
 
 def stop():
     publish_data({"message": "Stopped"})
+    client.disconnect()
 
 
 if __name__ == "__main__":    
