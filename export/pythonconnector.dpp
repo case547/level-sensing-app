@@ -1,0 +1,9 @@
+#Deployment Plugin Project File
+#Tue Aug 03 09:58:44 BST 2021
+bundles.count=0
+certificates.count=0
+general.signbundles=false
+headers.other.headers=
+headers.symbolic.name=pythonconnector
+headers.version=1.0.0
+resources.count=0

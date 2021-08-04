@@ -1,0 +1,20 @@
+#Deployment Plugin Project File
+#Tue Aug 03 10:02:16 BST 2021
+build.ant.name=<.>\\pythonconnector_build.xml
+build.dp.file=<.>\\pythonconnector.dp
+build.location=
+bundles.0.bundle_path=<.>\\.project
+bundles.0.customizer=false
+bundles.0.headers.count=0
+bundles.0.missing=false
+bundles.0.name=bundles/com.xylem.xgw.bundle.pythonconnector.jar
+bundles.0.symbolic_name=com.xylem.xgw.bundle.pythonconnector;singleton\:\=true
+bundles.0.version=1.0.0.qualifier
+bundles.count=1
+certificates.count=0
+general.signbundles=false
+headers.other.headers=
+headers.symbolic.name=pythonconnector
+headers.version=1.0.0
+resources.count=0
+

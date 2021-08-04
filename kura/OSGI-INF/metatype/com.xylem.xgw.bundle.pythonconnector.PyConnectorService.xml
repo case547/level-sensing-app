@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<MetaData xmlns="http://www.osgi.org/xmlns/metatype/v1.2.0" localization="en_us">
+    <OCD id="com.xylem.xgw.bundle.pythonconnector.PyConnectorService"
+        name="PyConnectorService"
+        description="Python Connector configuration">
+
+        <AD id="CloudPublisher.target"
+            name="CloudPublisher Target Filter"
+            type="String"
+            cardinality="0"
+            required="true"
+            default="(kura.service.pid=changeme)"
+            description="Specifies, as an OSGi target filter, the pid of the Cloud Publisher used to publish messages to the cloud platform.">
+        </AD>
+
+        <AD id="python_interpreter"
+            name="Python interpreter"
+            type="String"
+            cardinality="0"
+            required="true"
+            default="python3"
+            description="The python interpreter to call.">
+         </AD>
+
+        <AD id="py_file"
+            name="Python file name"
+            type="String"
+            cardinality="0"
+            required="true"
+            default="~/app.py"
+            description="The python file to run.">
+         </AD>
+
+        <AD id="get_interval"
+            name="Data Interval"
+            type="Float"
+            cardinality="0"
+            required="true"
+            default="5"
+            min="0.5"
+            description="The interval at which this module request data from the python application.">
+         </AD>
+
+        <AD id="parameters"
+            name="Parameters"
+            type="String"
+            cardinality="0"
+            required="true"
+            default="{}"
+            description="Parameters to provide to your python code in JSON format.">
+         </AD>
+    </OCD>
+
+    <Designate pid="com.xylem.xgw.bundle.pythonconnector.PyConnectorService">
+        <Object ocdref="com.xylem.xgw.bundle.pythonconnector.PyConnectorService"/>
+    </Designate>
+</MetaData>
