@@ -1,16 +1,12 @@
 # -*- coding: utf-8 -*-
 
 from kuraconnector import publish_data, run
-from time import time, sleep
-from math import sin, cos
-
-import warnings
-from copy import copy
-from enum import Enum
 
 import numpy as np
 
 import exptool as et
+
+from processor import Processor, ProcessingConfiguration as get_processing_config
 
 data_interval = 0
 
@@ -18,8 +14,11 @@ def start(get_interval, params):
     global data_interval
     global client
     global processor
+    global nbr_average
     publish_data({"message": "Started with get_interval={:f}, parameters={:s}".format(get_interval, str(params))})
     data_interval = get_interval
+
+    nbr_average = params["nbr_average"]
 
     client = et.SocketClient(params['ip_a']) # Raspberry Pi uses socket client
     
@@ -46,7 +45,7 @@ def start(get_interval, params):
 def get(counter):
     global data_interval
     # Grab a measurement here - averaged over 5 sweeps for noise reduction
-    for _ in range(5):
+    for _ in range(nbr_average):
         info, sweep = client.get_next()
         plot_data = processor.process(sweep, info)
 
@@ -67,13 +66,6 @@ def get_sensor_config(config, params):
                 setattr(config, k, eval(v))
             except:
                 setattr(config, k, v)
-
-    # downsampling_factor - must be 1, 2, or 4
-    # hw_accelerated_average_samples - number of samples taken for single point in data, [1,63]
-    # range_interval - measurement range (metres)
-    # running_average_factor - keep as 0; use averaging in detector instead of in API
-    # tx_disable - enable/disable radio transmitter
-    # update_rate - target measurement rate (Hz)
 
     return config
 
