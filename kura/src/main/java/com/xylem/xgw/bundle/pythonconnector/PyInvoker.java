@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
 public class PyInvoker {
 	
 	public interface DataReceiver {
-		public void onData(Map<String, Object> data);
+		public void onMessage(String deviceName, String messageType, Map<String, Object> data);
 	}
 	
 	private static final Logger kuraLogger = LoggerFactory.getLogger(PyInvoker.class);
@@ -255,13 +255,23 @@ public class PyInvoker {
 						//End of stream
 						break;
 					}
-					String[] parts = line.split("\t", 2);
-					if(parts.length == 2 && parts[0].equals("DATA"))
+					String[] parts = line.split("\t", 3);
+					if(parts.length == 3)
 					{
-						Map<String, Object> args = parseArgs(parts[1]);
-						if(!args.isEmpty())
+						String messageType = parts[0];
+						String deviceName = parts[1];
+						String payload = parts[2];
+						if(messageType.equals("DATA") || messageType.equals("STATUS"))
 						{
-							dataReceiver.onData(args);
+							Map<String, Object> metrics = parseArgs(payload);
+							if(!metrics.isEmpty())
+							{
+								dataReceiver.onMessage(deviceName, messageType, metrics);
+							}
+						}
+						else
+						{
+							kuraLogger.warn("Invalid message type: {}", messageType);
 						}
 					}
 					else
@@ -385,3 +395,5 @@ public class PyInvoker {
 	}
 
 }
+
+//TODO: Auto restart option, if an error occurs and the process terminates (somewhat like a watchdog)?

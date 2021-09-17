@@ -8,7 +8,7 @@ import json
 from kuraconnector import parse_line
 
 
-PY_INTERPRETER = "python"
+PY_INTERPRETER = "python3"
 
 def write_and_flush(stdin, string):
     stdin.write((string+"\n").encode())

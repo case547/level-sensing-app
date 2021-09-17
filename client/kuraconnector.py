@@ -9,26 +9,37 @@ import traceback
     
 _running = False
 
-def publish_data(data):
+
+def publish(payload, message_type, device):
+    if message_type not in ("DATA", "STATUS"):
+        raise RuntimeError("Invalid message type")
+
     parts = []
-    for (k, v) in data.items():
+    for (k, v) in payload.items():
         if isinstance(v, str):
             f_str = "\"{:s}\""
             v = escape_string(v)
-        #elif isinstance(v, (int, np.int8, np.int16, np.int32, np.int64, np.uint8, np.uint16, np.uint32, np.uint64)):
+        # elif isinstance(v, (int, np.int8, np.int16, np.int32, np.int64, np.uint8, np.uint16, np.uint32, np.uint64)):
         elif isinstance(v, int):
             f_str = "{:d}"
-        #elif isinstance(v, (float, np.float16, np.float32, np.float64)):
+        # elif isinstance(v, (float, np.float16, np.float32, np.float64)):
         elif isinstance(v, float):
             f_str = "{:.15e}"
         else:
             continue
-        parts.append(("{:s}="+f_str).format(k, v))
-    print("DATA\t"+"\t".join(parts))
-    
-#TODO: Add a function to publish a status
-#TODO: Sort out how exceptions from the callbacks can be shown properly.
-    
+        parts.append(("{:s}=" + f_str).format(k, v))
+
+    print("\t".join([message_type, device] + parts))
+
+
+def publish_data(data, device="unknown"):
+    publish(data, "DATA", device)
+
+
+def publish_status(status, device="unknown"):
+    publish(status, "STATUS", device)
+
+
 def run(start_callback=None, get_callback=None, stop_callback=None):
     global _running
     with open('kuraconnector_error.log', 'w') as stderr, redirect_stderr(stderr):
@@ -46,7 +57,6 @@ def run(start_callback=None, get_callback=None, stop_callback=None):
                     if cmd == "START":
                         _running = True
                         try:
-                            stderr.write(args["PARAMS"])
                             params = json.loads(args["PARAMS"])
                         except (KeyError, ValueError):
                             params = {}
@@ -82,7 +92,7 @@ def run(start_callback=None, get_callback=None, stop_callback=None):
                             sys.stderr.write("Shutdown task is taking too long. Shutting down anyway.")
                             pass
                         break
-        except:
+        except Exception:
             traceback.print_exc()
             
                 
@@ -102,28 +112,29 @@ def is_stopped():
 #     return s
 
 def escape_string(s):
-	return s.replace("\\", "\\\\") \
-		.replace("\t", "\\t") \
-		.replace("\b", "\\b") \
-		.replace("\n", "\\n") \
-		.replace("\r", "\\r") \
-		.replace("\f", "\\f") \
-		.replace("\'", "\\'") \
-		.replace("\"", "\\\"")
-	
-	
+    return s.replace("\\", "\\\\") \
+        .replace("\t", "\\t") \
+        .replace("\b", "\\b") \
+        .replace("\n", "\\n") \
+        .replace("\r", "\\r") \
+        .replace("\f", "\\f") \
+        .replace("\'", "\\'") \
+        .replace("\"", "\\\"")
+
+
 def unescape_string(s):
-	return s.replace("\\\"", "\"") \
-		.replace("\\'", "\'") \
-		.replace("\\t", "\t") \
-		.replace("\\b", "\b") \
-		.replace("\\n", "\n") \
+    return s.replace("\\\"", "\"") \
+        .replace("\\'", "\'") \
+        .replace("\\t", "\t") \
+        .replace("\\b", "\b") \
+        .replace("\\n", "\n") \
         .replace("\\r", "\r") \
         .replace("\\f", "\f") \
         .replace("\\\\", "\\")
 
+
 def parse_line(line):
-    parts = line.split("\t")
+    parts = line.rstrip().split("\t")
     cmd = parts[0]
     args = {}
     for arg in parts[1:]:
@@ -144,4 +155,5 @@ def parse_line(line):
         args[key]=value
     return (cmd, args)
         
-#TODO: log warnings, if incoming commands are malformed.
+# TODO: log warnings, if incoming commands are malformed.
+# TODO: Sort out how exceptions from the callbacks can be shown properly.

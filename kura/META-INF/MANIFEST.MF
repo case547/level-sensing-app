@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: com.xylem.xgw.bundle.pythonconnector
 Bundle-SymbolicName: com.xylem.xgw.bundle.pythonconnector;singleton:=true
-Bundle-Version: 1.0.1.qualifier
+Bundle-Version: 1.1.1.qualifier
 Bundle-Vendor: Xylem
 Automatic-Module-Name: com.xylem.xgw.bundle.pythonconnector
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8

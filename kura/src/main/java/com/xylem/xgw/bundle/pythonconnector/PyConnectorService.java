@@ -38,10 +38,9 @@ public class PyConnectorService implements ConfigurableComponent, CloudConnectio
 	{
 
 		@Override
-		public void onData(Map<String, Object> data) {
-			kuraLogger.info("New data: {}", data);
-			publish(data);
-			
+		public void onMessage(String deviceName, String messageType, Map<String, Object> data) {
+			kuraLogger.debug("New {} message from device {}: {}", messageType, deviceName, data);
+			publish(deviceName, messageType, data);			
 		}
 		
 	}
@@ -157,7 +156,7 @@ public class PyConnectorService implements ConfigurableComponent, CloudConnectio
 		this.cloudPublisher = null;
 	}
 	
-	private void publish(Map<String, Object> topicsAndValues) {
+	private void publish(String deviceName, String messageType, Map<String, Object> topicsAndValues) {
 		if (this.cloudPublisher == null) {
 			kuraLogger.warn("No cloud publisher selected. Cannot publish!");
 			return;
@@ -172,7 +171,24 @@ public class PyConnectorService implements ConfigurableComponent, CloudConnectio
 		// Add metrics
 		topicsAndValues.forEach((topic, value) -> payload.addMetric(topic, value));
 
-		KuraMessage message = new KuraMessage(payload);
+		// Assign message type property
+		Map<String, Object> properties = new HashMap<String, Object>();
+		String messageTypeOut;
+		switch(messageType)
+		{
+		case "DATA":
+			messageTypeOut = "data";
+			break;
+		case "STATUS":
+			messageTypeOut = "status";
+			break;
+		default:
+			messageTypeOut = "dump";			
+		}
+		properties.put("messageType", messageTypeOut);
+		properties.put("assetName", deviceName);
+
+		KuraMessage message = new KuraMessage(payload, properties);
 
 		// Publish the message
 		try {
