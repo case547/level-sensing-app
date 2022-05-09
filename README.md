@@ -4,28 +4,28 @@
 1. [Background](#1-background)
     1. [Proposal](#11-proposal)
     2. [Architecture](#12-architecture)
-    3. [Hardware](13-hardware)
-2. [Sofware](2-software)
-3. [ESF Install](3-esf-install)
-4. [Acconeer Evaluation Kit Setup](4-acconeer-evaluation-kit-setup)
-    1. [Getting Started](41-getting-started)
-    2. [Port Opening](42-port-opening)
-    3. [Installing Dependencies](43-installing-dependencies)
-5. [Testing](5-testing)
-    1. [Directly Running the App](51-directly-running-the-app)
-    2. [Running the Tester](52-running-the-tester)
-6. [Python Connector Setup](6-python-connector-setup)
-    1. [Deployment Package Installation](61-deployment-package-installation)
-    2. [New Publisher Creation](62-new-publisher-creation)
-    3. [PyConnectorService Configuration](63-pyconnector-configuration)
-7. [Logging Data Locally](7-logging-data-locally)
-8. [Running](8-running)
-    1. [Data Warnings](81-data-warnings)
+    3. [Hardware](#13-hardware)
+2. [Sofware](#2-software)
+3. [ESF Install](#3-esf-install)
+4. [Acconeer Evaluation Kit Setup](#4-acconeer-evaluation-kit-setup)
+    1. [Getting Started](#41-getting-started)
+    2. [Port Opening](#42-port-opening)
+    3. [Installing Dependencies](#43-installing-dependencies)
+5. [Testing](#5-testing)
+    1. [Directly Running the App](#51-directly-running-the-app)
+    2. [Running the Tester](#52-running-the-tester)
+6. [Python Connector Setup](#6-python-connector-setup)
+    1. [Deployment Package Installation](#61-deployment-package-installation)
+    2. [New Publisher Creation](#62-new-publisher-creation)
+    3. [PyConnectorService Configuration](#63-pyconnector-configuration)
+7. [Logging Data Locally](#7-logging-data-locally)
+8. [Running](#8-running)
+    1. [Data Warnings](#81-data-warnings)
 
 Appendices
 
-* [Appendix A: Sensor/Processing Configuration](appendix-a-sensorprocessing-configuration)
-* [Appendix B: Troubleshooting](appendix-b-troubleshooting)
+* [Appendix A: Sensor/Processing Configuration](#appendix-a-sensorprocessing-configuration)
+* [Appendix B: Troubleshooting](#appendix-b-troubleshooting)
 
 ---
 
@@ -82,7 +82,7 @@ Here are the key things each event handler does, vaguely in order:
 The below assumes your Raspberry Pi already has ESF installed and has been provisioned to connect to Xylem's Everyware Cloud. If not, see [Moving generic xGW's to EverywareCloud Environment](https://xyleminc.atlassian.net/wiki/spaces/XGW/pages/644220906/Moving+generic+xGW+s+to+EverywareCloud+Environment). You can find the right install file from the [ESF download page](https://www.eurotech.com/download/en/pb.aspx?pg=ESF), under *System Distribution* > *esf-raspberry-pi...rpm*
 
 ## 4 Acconeer Evaluation Kit Setup
-If this is being read a while after summer 2021, you may want to check the official sources: [EVK Getting Started Guide](https://developer.acconeer.com/) (*Documents and learning* > *XC112/XR112*) and [Setting up your Raspberry Pi EVK](https://acconeer-python-exploration.readthedocs.io/en/latest/evk_setup/raspberry.html). After which, skip to the note on [Port Opening](42-port-opening).
+If this is being read a while after summer 2021, you may want to check the official sources: [EVK Getting Started Guide](https://developer.acconeer.com/) (*Documents and learning* > *XC112/XR112*) and [Setting up your Raspberry Pi EVK](https://acconeer-python-exploration.readthedocs.io/en/latest/evk_setup/raspberry.html). After which, skip to the note on [Port Opening](#42-port-opening).
 
 ### 4.1 Getting Started
 * In Raspberry Pi Configuration > Interfaces, ensure SSH, SPI, and I2C are enabled
@@ -170,7 +170,7 @@ As with before, GET data should show up in both the terminal and `sessions.log`.
 * Enter your parameters in a dictionary wrapped by `{}`
     * Required: `"ip_a"` specifiying the IP address of the target device
     * Recommended: `"device_name"` uniquely identifying the device that's pushing the data
-    * Other items are optional, and configure either the sensor or processing (see the [Appendix A](appendix-a-sensorprocessing-configuration))
+    * Other items are optional, and configure either the sensor or processing (see the [Appendix A](#appendix-a-sensorprocessing-configuration))
 
 ## 7 Logging Data Locally
 Note this step is optional. If you do need to operate without internet connection, ensure that the ip address you are connecting with is the loopback interface `127.0.0.1`.
